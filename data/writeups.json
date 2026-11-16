@@ -1,0 +1,117 @@
+[
+  {
+    "id": "meow",
+    "type": "machine",
+    "name": "Meow",
+    "os": "Linux",
+    "difficulty": "Easy",
+    "status": "Retired",
+    "date": "2026-10-12",
+    "tags": ["Telnet", "Misconfiguration", "Reconnaissance"],
+    "summary": "Enumeración básica de red que expone un servicio Telnet mal configurado permitiendo acceso administrativo sin contraseña.",
+    "protected": false,
+    "content": {
+      "tldr": "La máquina presenta el puerto 23 (Telnet) abierto y configurado para permitir el inicio de sesión como usuario 'root' sin requerir credenciales.",
+      "enumText": "Iniciamos con un escaneo de puertos utilizando Nmap para identificar servicios activos:",
+      "enumCommand": "nmap -sC -sV -p- --min-rate 5000 10.129.1.17",
+      "enumOutput": "PORT   STATE SERVICE VERSION\n23/tcp open  telnet  Linux telnetd",
+      "exploit": "Al detectar Telnet expuesto, intentamos establecer conexión directa utilizando credenciales por defecto comunes (root sin contraseña).",
+      "privesc": "El acceso inicial otorga directamente una shell interactiva como superusuario (root), permitiendo leer la bandera en /root/flag.txt.",
+      "images": [
+        {
+          "src": "https://placehold.co/800x350/0b0e14/9fef00?text=Captura+Nmap+%26+Telnet+Root+Shell",
+          "caption": "Fig 1. Escaneo Nmap confirmando puerto 23 abierto y acceso directo como root."
+        }
+      ],
+      "remediation": "Deshabilitar el servicio Telnet de inmediato debido a que transmite datos en texto plano y reemplazarlo por SSH con autenticación basada en llaves criptográficas."
+    }
+  },
+  {
+    "id": "cap",
+    "type": "machine",
+    "name": "Cap",
+    "os": "Linux",
+    "difficulty": "Easy",
+    "status": "Retired",
+    "date": "2026-10-28",
+    "tags": ["IDOR", "PCAP Analysis", "Linux Capabilities"],
+    "summary": "Explotación de vulnerabilidad IDOR para descargar capturas de tráfico de red en texto plano y escalada mediante Python Capabilities.",
+    "protected": false,
+    "content": {
+      "tldr": "Una aplicación web permite descargar archivos PCAP de otros usuarios manipulando el parámetro numérico en la URL (IDOR). Dentro del tráfico capturado se encuentran credenciales FTP en texto plano.",
+      "enumText": "Escaneo inicial revela los puertos 21 (FTP), 22 (SSH) y 80 (HTTP corriendo Gunicorn):",
+      "enumCommand": "nmap -sC -sV 10.10.10.245",
+      "enumOutput": "21/tcp open  ftp     vsftpd 3.0.3\n22/tcp open  ssh     OpenSSH 8.2p1\n80/tcp open  http    gunicorn",
+      "exploit": "Cambiando el ID de /data/1 a /data/0 descargamos una captura previa con credenciales de FTP del usuario 'nathan', reutilizadas en SSH.",
+      "privesc": "Abusamos de cap_setuid+ep en /usr/bin/python3.8 para escalar a root.",
+      "images": [
+        {
+          "src": "https://placehold.co/800x350/0b0e14/9fef00?text=Wireshark+FTP+Credentials+Leak",
+          "caption": "Fig 1. Análisis de captura PCAP obtenida por IDOR revelando contraseña en texto plano."
+        }
+      ],
+      "remediation": "Implementar control de acceso basado en sesiones en el backend para evitar IDOR y migrar FTP a SFTP."
+    }
+  },
+  {
+    "id": "challenge-web-templated",
+    "type": "challenge",
+    "name": "Templated",
+    "category": "Web",
+    "difficulty": "Easy",
+    "status": "Retired",
+    "date": "2026-11-02",
+    "tags": ["SSTI", "Jinja2", "Python Flask"],
+    "summary": "Inyección de plantillas del lado del servidor (SSTI) en una aplicación Flask/Jinja2 que permite ejecución remota de código (RCE).",
+    "protected": false,
+    "content": {
+      "tldr": "La aplicación refleja rutas inexistentes (Error 404) directamente dentro de una plantilla Jinja2 sin sanitizar, permitiendo ejecutar comandos arbitrarios en el servidor.",
+      "enumText": "Inspeccionamos las cabeceras HTTP de respuesta y probamos expresiones matemáticas en la URL para confirmar SSTI:",
+      "enumCommand": "curl -i http://target:port/%7B%7B7*7%7D%7D",
+      "enumOutput": "HTTP/1.1 404 NOT FOUND\nServer: Werkzeug/1.0.1 Python/3.9.0\n...\nThe page '49' could not be found",
+      "exploit": "Inyectamos un payload de introspección de clases de Python para acceder a subprocess.Popen y leer el archivo flag.txt del directorio raíz.",
+      "privesc": "No aplica (Reto CTF centrado en obtención directa de flag mediante RCE).",
+      "images": [
+        {
+          "src": "https://placehold.co/800x350/0b0e14/9fef00?text=SSTI+Payload+Execution+in+Browser",
+          "caption": "Fig 1. Confirmación de evaluación de plantilla Jinja2 en página de error 404."
+        }
+      ],
+      "remediation": "Nunca concatenar entradas del usuario directamente en cadenas de plantillas. Pasar las variables como argumentos de contexto al motor de renderizado (ej. render_template('404.html', url=request.path))."
+    }
+  },
+  {
+    "id": "sherlock-forensics",
+    "type": "challenge",
+    "name": "Brutus",
+    "category": "Sherlock / Forensics",
+    "difficulty": "Easy",
+    "status": "Retired",
+    "date": "2026-11-10",
+    "tags": ["Linux Logs", "auth.log", "wtmp", "Incident Response"],
+    "summary": "Análisis forense de registros auth.log y wtmp en Linux para reconstruir un ataque de fuerza bruta SSH y persistencia.",
+    "protected": false,
+    "content": {
+      "tldr": "Mediante el análisis correlacionado de auth.log y registros binarios wtmp se identifica la IP atacante, el momento exacto del compromiso por fuerza bruta y la creación de un usuario backdoor.",
+      "enumText": "Filtramos intentos fallidos y exitosos de autenticación SSH en el archivo auth.log:",
+      "enumCommand": "grep 'Accepted password' auth.log | awk '{print $1, $2, $3, $9, $11}'",
+      "enumOutput": "Mar 6 06:32:45 root 65.2.161.68",
+      "exploit": "Analizamos los eventos posteriores de useradd y modificación de sudoers para responder las preguntas de investigación del incidente.",
+      "privesc": "El atacante obtuvo acceso directo como root tras comprometer credenciales débiles.",
+      "images": [],
+      "remediation": "Implementar Fail2Ban, deshabilitar autenticación por contraseña en SSH y configurar alertas SIEM ante múltiples intentos fallidos de inicio de sesión."
+    }
+  },
+  {
+    "id": "active-box",
+    "type": "machine",
+    "name": "Cicada (Active)",
+    "os": "Windows",
+    "difficulty": "Medium",
+    "status": "Active",
+    "date": "2026-11-14",
+    "tags": ["Active Directory", "SMB", "RID Cycling"],
+    "summary": "Enumeración de Active Directory vía SMB null session y explotación de políticas de grupo. [Protegido por Root Flag según normativa HTB]",
+    "protected": true
+  }
+]

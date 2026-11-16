@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecPortfolio | Hack The Box Write-ups & Research</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+    <!-- SIDEBAR DE PERFIL -->
+    <aside>
+        <div class="terminal-badge">root@portfolio:~# whoami</div>
+        <h2 class="profile-name">Kevin Restrepo</h2>
+        <div class="profile-role">Junior Penetration Tester | Network & Security</div>
+        <p class="profile-bio">
+            Documentación técnica de resolución de máquinas, retos CTF y análisis forense. Enfocado en metodologías ofensivas y remediación defensiva.
+        </p>
+
+        <!-- Widget de Hack The Box -->
+        <div class="htb-widget">
+            <div class="htb-widget-header">
+                <span>Sh41t4n ID: #3137809</span>
+            </div>
+            <div class="htb-rank">Rank: Hacker</div>
+            <div class="htb-stats">
+                <div class="stat-box"><span>24</span>Machines</div>
+                <div class="stat-box"><span>15</span>Challenges</div>
+            </div>
+        </div>
+
+        <div class="skills-tags">
+            <span class="tag">Linux PrivEsc</span>
+            <span class="tag">Active Directory</span>
+            <span class="tag">Python Scripting</span>
+            <span class="tag">Web Exploitation</span>
+            <span class="tag">Network Forensics</span>
+            <span class="tag">Reverse Engineering</span>
+        </div>
+
+        <div class="social-links">
+            <a href="assets/cv.pdf" target="_blank" class="btn btn-primary">📄 Descargar CV (PDF)</a>
+            <a href="https://github.com" target="_blank" class="btn btn-outline">GitHub / Exploits</a>
+            <a href="https://linkedin.com" target="_blank" class="btn btn-outline">LinkedIn</a>
+        </div>
+    </aside>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main>
+        <!-- VISTA DE DIRECTORIO -->
+        <div id="directory-view">
+            <header>
+                <h1>Write-ups & Research Log</h1>
+                <p>Metodología paso a paso: Enumeración, Explotación, Análisis y Remediación.</p>
+                
+                <!-- PESTAÑAS DE CATEGORÍA (MÁQUINAS VS CHALLENGES) -->
+                <div class="category-tabs">
+                    <button class="tab-btn active" data-type="machine">🖥️ Máquinas (Boxes)</button>
+                    <button class="tab-btn" data-type="challenge">🚩 Challenges & Sherlocks</button>
+                </div>
+            </header>
+
+            <div class="controls">
+                <input type="text" id="searchInput" class="search-input" placeholder="Buscar por nombre, categoría (Web, Crypto, Forensics) o técnica...">
+                <div class="filter-group" id="difficultyFilters">
+                    <button class="filter-btn active" data-filter="all">Todas</button>
+                    <button class="filter-btn" data-filter="Easy">Easy</button>
+                    <button class="filter-btn" data-filter="Medium">Medium</button>
+                    <button class="filter-btn" data-filter="Hard">Hard</button>
+                </div>
+            </div>
+
+            <div class="machines-grid" id="machinesGrid">
+                <!-- Las tarjetas se cargan dinámicamente desde data/writeups.json -->
+            </div>
+        </div>
+
+        <!-- VISTA DE ARTÍCULO COMPLETO -->
+        <div id="article-view">
+            <button class="back-btn" id="backBtn">← Volver al directorio</button>
+            <div id="article-container"></div>
+        </div>
+    </main>
+
+    <!-- MODAL PARA AMPLIAR CAPTURAS DE PANTALLA (LIGHTBOX) -->
+    <div id="imageModal" class="modal">
+        <span class="modal-close" id="modalClose">&times;</span>
+        <img class="modal-content" id="modalImg" alt="Evidencia ampliada">
+        <div id="modalCaption"></div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
