@@ -59,7 +59,7 @@ Abre la carpeta del proyecto en Visual Studio Code y haz clic en "Go Live" en la
 📝 Cómo Añadir un Nuevo Write-up
 Para publicar una nueva máquina o reto resuelto, añade un objeto al arreglo de data/writeups.json siguiendo esta plantilla:
 
-JSON
+```JSON
 {
   "id": "nombre-maquina",
   "type": "machine",
@@ -87,6 +87,7 @@ JSON
     "remediation": "Medidas técnicas recomendadas para mitigar las vulnerabilidades encontradas."
   }
 }
+```
 (Para añadir un reto en lugar de una máquina, cambia "type": "challenge" y reemplaza "os" por "category": "Web" o "Forensics").
 
 ⚠️ Aviso Legal y Ético
